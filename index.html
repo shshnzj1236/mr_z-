@@ -90,6 +90,24 @@
             100% { background-position: 0% 50%; }
         }
 
+        /* STATUS 霓虹呼吸燈動態效果 */
+        .status-glow-tag {
+            animation: statusPulse 2s infinite alternate ease-in-out;
+        }
+
+        @keyframes statusPulse {
+            0% {
+                box-shadow: 0 0 4px rgba(168, 85, 247, 0.3);
+                border-color: rgba(168, 85, 247, 0.3);
+                background-color: rgba(168, 85, 247, 0.1);
+            }
+            100% {
+                box-shadow: 0 0 12px rgba(168, 85, 247, 0.8), 0 0 20px rgba(168, 85, 247, 0.4);
+                border-color: rgba(192, 132, 252, 0.8);
+                background-color: rgba(168, 85, 247, 0.25);
+            }
+        }
+
         /* 按鈕光芒流動動畫 */
         .btn-shimmer {
             position: relative;
@@ -132,7 +150,7 @@
             50% { opacity: 0; }
         }
 
-        /* 相冊堆疊與動畫 */
+        /* 堆疊卡片動畫與樣式 */
         .stack-container {
             position: relative;
             perspective: 1000px;
@@ -162,6 +180,15 @@
             opacity: 0.65;
         }
 
+        /* 社交圖示 Hover 發光微調 */
+        .social-icon-glow {
+            transition: all 0.3s ease;
+        }
+        .social-icon-glow:hover {
+            filter: drop-shadow(0 0 8px currentColor);
+            transform: translateY(-2px);
+        }
+
         /* Toast 提示彈窗 */
         #toast {
             transition: opacity 0.3s ease, transform 0.3s ease;
@@ -169,6 +196,9 @@
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center relative p-4 md:p-8 select-none">
+
+    <!-- 音樂播放器隱藏標籤 -->
+    <audio id="bgmAudio" loop preload="auto"></audio>
 
     <!-- 背景動態閃電與粒子 Canvas -->
     <canvas id="lightningCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
@@ -243,53 +273,64 @@
                 </a>
             </div>
 
-            <!-- 自訂備註與社交圖示區塊 -->
+            <!-- 自訂備註、STATUS 與音樂播放面板 -->
             <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 space-y-3">
                 <div class="flex justify-between items-center text-xs text-gray-400">
                     <span class="font-mono">blablabla</span>
-                    <span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded text-[10px] font-semibold border border-purple-500/20">STATUS</span>
+                    <span class="status-glow-tag text-purple-300 px-2.5 py-0.5 rounded text-[10px] font-semibold border transition-all">STATUS</span>
                 </div>
-                <p class="text-xs text-gray-400 italic">nothing..........</p>
+                <!-- STATUS 下方動態切換文字 -->
+                <p class="text-xs text-purple-300/80 italic font-mono flex items-center gap-1">
+                    <span id="statusMessage">nothing..........</span><span class="cursor-blink opacity-75"></span>
+                </p>
 
-                <div class="pt-2 border-t border-white/5 flex items-center space-x-4 text-gray-400 text-lg">
-                    <a href="#" class="hover:text-green-400 transition-colors"><i class="fa-brands fa-spotify"></i></a>
-                    <a href="#" class="hover:text-red-500 transition-colors"><i class="fa-brands fa-youtube"></i></a>
-                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-github"></i></a>
-                    <a href="#" class="hover:text-indigo-400 transition-colors"><i class="fa-brands fa-discord"></i></a>
+                <!-- 背景音樂控制按鈕 -->
+                <div class="pt-2 border-t border-white/5 flex items-center justify-between">
+                    <div class="flex items-center space-x-4 text-gray-400 text-lg">
+                        <a href="#" class="social-icon-glow hover:text-green-400"><i class="fa-brands fa-spotify"></i></a>
+                        <a href="#" class="social-icon-glow hover:text-red-500"><i class="fa-brands fa-youtube"></i></a>
+                        <a href="#" class="social-icon-glow hover:text-white"><i class="fa-brands fa-github"></i></a>
+                        <a href="#" class="social-icon-glow hover:text-indigo-400"><i class="fa-brands fa-discord"></i></a>
+                    </div>
+                    <!-- 音樂播放按鈕 -->
+                    <button id="musicToggleBtn" onclick="toggleMusic()" class="flex items-center gap-2 text-xs font-mono px-3 py-1.5 rounded-lg bg-purple-600/30 border border-purple-500/40 text-purple-200 hover:bg-purple-600/50 transition-all">
+                        <i id="musicIcon" class="fa-solid fa-music"></i>
+                        <span id="musicText">Play Music</span>
+                    </button>
                 </div>
             </div>
 
         </section>
 
-        <!-- 右側：動態相片輪播區塊 (佔 7 欄) -->
+        <!-- 右側：動態影片輪播區塊 (佔 7 欄) -->
         <section class="lg:col-span-7 flex flex-col items-center justify-center relative mt-4 lg:mt-0">
             
-            <!-- 相片堆疊容器 -->
+            <!-- 影片堆疊容器 -->
             <div class="stack-container w-full max-w-lg h-[340px] md:h-[420px] flex items-center justify-center">
                 
                 <!-- 卡片 0 (最上層) -->
-                <div id="card0" onclick="nextSlide()" class="stack-card pos-0 absolute w-full h-full rounded-2xl overflow-hidden cursor-pointer border border-white/15">
-                    <img id="img0" src="" class="w-full h-full object-cover">
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
+                <div id="card0" class="stack-card pos-0 absolute w-full h-full rounded-2xl overflow-hidden border border-white/15 bg-slate-900">
+                    <video id="video0" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6 pointer-events-none">
                         <p class="text-white text-sm font-medium tracking-wide flex items-center gap-2">
-                            <i class="fa-solid fa-camera"></i> <span id="caption0">Shot Preview</span>
+                            <i class="fa-solid fa-video text-purple-400"></i> <span id="caption0">Video Preview</span>
                         </p>
                     </div>
                 </div>
 
                 <!-- 卡片 1 (第二層) -->
-                <div id="card1" onclick="nextSlide()" class="stack-card pos-1 absolute w-full h-full rounded-2xl overflow-hidden cursor-pointer border border-white/10">
-                    <img id="img1" src="" class="w-full h-full object-cover">
+                <div id="card1" class="stack-card pos-1 absolute w-full h-full rounded-2xl overflow-hidden border border-white/10 bg-slate-900">
+                    <video id="video1" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
                 </div>
 
                 <!-- 卡片 2 (第三層) -->
-                <div id="card2" onclick="nextSlide()" class="stack-card pos-2 absolute w-full h-full rounded-2xl overflow-hidden cursor-pointer border border-white/5">
-                    <img id="img2" src="" class="w-full h-full object-cover">
+                <div id="card2" class="stack-card pos-2 absolute w-full h-full rounded-2xl overflow-hidden border border-white/5 bg-slate-900">
+                    <video id="video2" class="w-full h-full object-cover" autoplay loop muted playsinline></video>
                 </div>
 
             </div>
 
-            <!-- 控制控制鈕與指示燈 -->
+            <!-- 控制按鈕與指示燈 -->
             <div class="flex items-center space-x-6 mt-8 z-20">
                 <button onclick="prevSlide()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white hover:bg-purple-600 transition-all active:scale-95">
                     <i class="fa-solid fa-chevron-left"></i>
@@ -312,37 +353,100 @@
 
     <!-- JavaScript 腳本邏輯 -->
     <script>
-        /* ====================================================
-           【如何修改圖片與資料？】
-           你可以在下方直接修改圖片網址與打字機文字！
-        ==================================================== */
+        // ==========================================
+        // 1. 背景音樂設定 (在此替換為你要的音樂網址或檔名)
+        // ==========================================
+        const bgmUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
 
-        // 1. 右側相冊圖片網址列表（可自由增減或更換）
-        const galleryImages = [
-            'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80', // Porsche 跑車
-            'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', // 超跑
-            'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=80', // 夜晚街道攝影
-            'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80'  // 酷炫跑車
-        ];
+        const audioPlayer = document.getElementById('bgmAudio');
+        audioPlayer.src = bgmUrl;
+        let isPlaying = false;
 
-        // 2. 打字機要顯示的動態文字
-        const typingPhrases = ["v / Developer & Photographer", "FiveM Customizer", "Car Photography Enthusiast"];
+        function toggleMusic() {
+            const musicIcon = document.getElementById('musicIcon');
+            const musicText = document.getElementById('musicText');
 
-        /* ====================================================
-           系統自動邏輯（無需修改）
-        ==================================================== */
-
-        // 複製 Discord
-        function copyDiscord() {
-            navigator.clipboard.writeText("z_master");
-            const toast = document.getElementById('toast');
-            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
-            }, 2500);
+            if (isPlaying) {
+                audioPlayer.pause();
+                musicIcon.className = "fa-solid fa-music";
+                musicText.textContent = "Play Music";
+                isPlaying = false;
+            } else {
+                audioPlayer.play().then(() => {
+                    musicIcon.className = "fa-solid fa-pause text-purple-400";
+                    musicText.textContent = "Playing...";
+                    isPlaying = true;
+                }).catch(err => {
+                    console.log("Audio playback error: ", err);
+                });
+            }
         }
 
-        // 打字機效果
+        // ==========================================
+        // 2. 影片輪播設定 (在此替換為你要的影片網址與標題)
+        // ==========================================
+        const galleryVideos = [
+            {
+                src: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-on-a-road-at-sunset-17367-large.mp4',
+                title: 'Sunset Driving Shot'
+            },
+            {
+                src: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-smartphone-playing-a-game-41525-large.mp4',
+                title: 'Gaming Scene'
+            },
+            {
+                src: 'https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-sports-car-driving-on-a-curved-road-41551-large.mp4',
+                title: 'Aerial Car Cinematic'
+            }
+        ];
+
+        let currentIndex = 0;
+
+        function updateGallery() {
+            const total = galleryVideos.length;
+            for (let i = 0; i < 3; i++) {
+                const videoEl = document.getElementById(`video${i}`);
+                const videoIndex = (currentIndex + i) % total;
+                const videoData = galleryVideos[videoIndex];
+
+                if (videoEl.src !== videoData.src) {
+                    videoEl.src = videoData.src;
+                    videoEl.load();
+                    videoEl.play().catch(() => {}); // 靜音自動播放
+                }
+
+                if (i === 0) {
+                    document.getElementById('caption0').textContent = videoData.title;
+                }
+            }
+
+            // 更新指示燈
+            const dotsContainer = document.getElementById('dots');
+            dotsContainer.innerHTML = '';
+            galleryVideos.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-purple-500 w-6' : 'bg-white/30'}`;
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % galleryVideos.length;
+            updateGallery();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + galleryVideos.length) % galleryVideos.length;
+            updateGallery();
+        }
+
+        updateGallery();
+
+        // ==========================================
+        // 3. 打字機要顯示的動態文字
+        // ==========================================
+        const typingPhrases = ["Developer & Photographer", "FiveM Customizer", "Car Photography Enthusiast"];
+
         let phraseIdx = 0;
         let charIdx = 0;
         let isDeleting = false;
@@ -373,40 +477,57 @@
         }
         typeLoop();
 
-        // 相冊輪播控制
-        let currentIndex = 0;
+        // STATUS 區塊打字機效果
+        const statusPhrases = [
+            "nothing..........",
+            "Coding FiveM scripts...",
+            "Editing vehicle shots 📸",
+            "Online on Discord 💬"
+        ];
 
-        function updateGallery() {
-            const total = galleryImages.length;
-            for (let i = 0; i < 3; i++) {
-                const imgEl = document.getElementById(`img${i}`);
-                const imgIndex = (currentIndex + i) % total;
-                imgEl.src = galleryImages[imgIndex];
+        let statusIdx = 0;
+        let statusCharIdx = 0;
+        let isStatusDeleting = false;
+        const statusEl = document.getElementById('statusMessage');
+
+        function statusTypeLoop() {
+            const currentStatus = statusPhrases[statusIdx];
+            if (isStatusDeleting) {
+                statusEl.textContent = currentStatus.substring(0, statusCharIdx - 1);
+                statusCharIdx--;
+            } else {
+                statusEl.textContent = currentStatus.substring(0, statusCharIdx + 1);
+                statusCharIdx++;
             }
 
-            // 更新指示燈
-            const dotsContainer = document.getElementById('dots');
-            dotsContainer.innerHTML = '';
-            galleryImages.forEach((_, idx) => {
-                const dot = document.createElement('div');
-                dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-purple-500 w-6' : 'bg-white/30'}`;
-                dotsContainer.appendChild(dot);
-            });
+            let speed = isStatusDeleting ? 30 : 70;
+
+            if (!isStatusDeleting && statusCharIdx === currentStatus.length) {
+                speed = 2500;
+                isStatusDeleting = true;
+            } else if (isStatusDeleting && statusCharIdx === 0) {
+                isStatusDeleting = false;
+                statusIdx = (statusIdx + 1) % statusPhrases.length;
+                speed = 400;
+            }
+
+            setTimeout(statusTypeLoop, speed);
+        }
+        statusTypeLoop();
+
+        // 複製 Discord
+        function copyDiscord() {
+            navigator.clipboard.writeText("z_master");
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }, 2500);
         }
 
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % galleryImages.length;
-            updateGallery();
-        }
-
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
-            updateGallery();
-        }
-
-        updateGallery();
-
-        // Canvas 背景閃電與光點粒子動畫
+        // ==========================================
+        // 4. Canvas 背景閃電與光點粒子動畫
+        // ==========================================
         const canvas = document.getElementById('lightningCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -417,7 +538,6 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // 浮動粒子
         const particles = Array.from({ length: 45 }, () => ({
             x: Math.random() * canvas.width,
             y: Math.random() * canvas.height,
@@ -426,7 +546,6 @@
             opacity: Math.random()
         }));
 
-        // 閃電繪製
         let lightning = [];
         function createLightning() {
             const startX = canvas.width / 2 + (Math.random() - 0.5) * 400;
@@ -447,7 +566,6 @@
         function animateCanvas() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 繪製粒子
             particles.forEach(p => {
                 p.y -= p.speedY;
                 if (p.y < 0) p.y = canvas.height;
@@ -457,12 +575,10 @@
                 ctx.fill();
             });
 
-            // 隨機觸發閃電
             if (Math.random() < 0.015 && lightning.length === 0) {
                 lightning.push(createLightning());
             }
 
-            // 繪製閃電
             lightning.forEach((l, index) => {
                 ctx.strokeStyle = `rgba(147, 197, 253, ${l.opacity})`;
                 ctx.lineWidth = 2;
