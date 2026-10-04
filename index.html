@@ -43,7 +43,7 @@
             overflow-x: hidden;
         }
 
-        /* 玻璃擬態 */
+        /* 玻璃擬態面板 */
         .glass-panel {
             background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(16px);
@@ -52,7 +52,7 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(168, 85, 247, 0.15);
         }
 
-        /* 背景星雲閃爍動畫 */
+        /* 背景星雲懸浮動畫 */
         .nebula-bg {
             position: absolute;
             border-radius: 50%;
@@ -90,7 +90,7 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* STATUS 霓虹呼吸燈動態效果 */
+        /* STATUS 霓虹呼吸燈動畫 */
         .status-glow-tag {
             animation: statusPulse 2s infinite alternate ease-in-out;
         }
@@ -108,7 +108,7 @@
             }
         }
 
-        /* 按鈕光芒流動動畫 */
+        /* 按鈕流光特效 */
         .btn-shimmer {
             position: relative;
             overflow: hidden;
@@ -150,7 +150,7 @@
             50% { opacity: 0; }
         }
 
-        /* 堆疊卡片動畫與樣式 */
+        /* 堆疊卡片樣式 */
         .stack-container {
             position: relative;
             perspective: 1000px;
@@ -180,7 +180,7 @@
             opacity: 0.65;
         }
 
-        /* 社交圖示 Hover 發光微調 */
+        /* 社交圖示懸浮 Glow */
         .social-icon-glow {
             transition: all 0.3s ease;
         }
@@ -189,7 +189,7 @@
             transform: translateY(-2px);
         }
 
-        /* Toast 提示彈窗 */
+        /* Toast 複製提示 */
         #toast {
             transition: opacity 0.3s ease, transform 0.3s ease;
         }
@@ -197,17 +197,14 @@
 </head>
 <body class="min-h-screen flex items-center justify-center relative p-4 md:p-8 select-none">
 
-    <!-- 音樂播放器隱藏標籤 -->
-    <audio id="bgmAudio" loop preload="auto"></audio>
-
-    <!-- 背景動態閃電與粒子 Canvas -->
+    <!-- 背景閃電與光點 Canvas -->
     <canvas id="lightningCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-    <!-- 背景彩虹星雲懸浮暈光 -->
+    <!-- 背景星雲暈光 -->
     <div class="nebula-bg bg-purple-600 w-96 h-96 top-10 left-10 z-0"></div>
     <div class="nebula-bg bg-blue-600 w-96 h-96 bottom-10 right-10 z-0" style="animation-delay: -6s;"></div>
 
-    <!-- 主要內容區塊容器 -->
+    <!-- 主卡片區域 -->
     <main class="relative z-10 w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
 
         <!-- 左側：個人資料卡片 (佔 5 欄) -->
@@ -220,13 +217,13 @@
                     <img id="userAvatar" src="https://cdn.discordapp.com/attachments/1014411791981346866/1556150201859833907/IMG_7063.jpg?backend=b2&ex=6ac31d4f&is=6ac1cbcf&hm=2123e6889177c99dcfe9688103b52c14b5bff990ea450484d130b89f75275571&" 
                          alt="Mr 𝓩 Avatar" 
                          class="w-20 h-20 md:w-22 md:h-22 object-cover rounded-2xl border border-white/20">
-                    <!-- 在線狀態指示點 (脈衝動畫) -->
+                    <!-- 在線狀態指示點 -->
                     <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-slate-900 rounded-full flex items-center justify-center">
                         <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     </span>
                 </div>
 
-                <!-- 名字與稱號 -->
+                <!-- 名字與動態頭銜 -->
                 <div>
                     <h1 class="text-3xl font-extrabold text-white tracking-wide flex items-center gap-2">
                         Mr 𝓩
@@ -238,27 +235,27 @@
                 </div>
             </div>
 
-            <!-- 關於我 (About Me) -->
+            <!-- ABOUT ME (具備紫色霓虹漸層發光與動態打字效果) -->
             <div class="mb-6">
                 <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                     <i class="fa-solid font-bold fa-user text-purple-400"></i> ABOUT ME:
                 </h2>
-                <p class="text-sm text-gray-300 leading-relaxed font-normal">
-                    I'm really into FiveM, car photography, and technical platform customization. Always crafting immersive visuals and exploring new digital aesthetics.
+                <p class="text-sm font-medium leading-relaxed text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-fuchsia-300 to-indigo-300 drop-shadow-[0_0_10px_rgba(168,85,247,0.5)]">
+                    <span id="aboutMeText"></span><span class="cursor-blink"></span>
                 </p>
             </div>
 
-            <!-- 聯絡方式區塊 (Contact Information) -->
+            <!-- 聯絡方式區塊 (CONTACT INFORMATION) -->
             <div class="mb-6 space-y-3">
                 <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
                     <i class="fa-solid fa-address-card text-blue-400"></i> CONTACT INFORMATION:
                 </h2>
 
-                <!-- Discord 點擊複製按鈕 -->
+                <!-- Discord 點擊複製按鈕 (shshnzj1236) -->
                 <div onclick="copyDiscord()" class="btn-shimmer flex items-center justify-between p-3.5 rounded-xl bg-slate-800/60 border border-white/10 hover:border-purple-500/50 hover:bg-slate-800/90 transition-all cursor-pointer group">
                     <div class="flex items-center space-x-3">
                         <i class="fa-brands fa-discord text-xl text-indigo-400 group-hover:scale-110 transition-transform"></i>
-                        <span class="text-sm font-medium text-gray-200">Discord: <strong class="text-white">z_master</strong></span>
+                        <span class="text-sm font-medium text-gray-200">Discord: <strong class="text-white">shshnzj1236</strong></span>
                     </div>
                     <i class="fa-regular fa-copy text-gray-400 group-hover:text-purple-400 transition-colors"></i>
                 </div>
@@ -273,36 +270,29 @@
                 </a>
             </div>
 
-            <!-- 自訂備註、STATUS 與音樂播放面板 -->
+            <!-- 自訂備註、STATUS 與社交圖示區塊 -->
             <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 space-y-3">
                 <div class="flex justify-between items-center text-xs text-gray-400">
                     <span class="font-mono">blablabla</span>
                     <span class="status-glow-tag text-purple-300 px-2.5 py-0.5 rounded text-[10px] font-semibold border transition-all">STATUS</span>
                 </div>
-                <!-- STATUS 下方動態切換文字 -->
+                <!-- STATUS 動態切換文字 -->
                 <p class="text-xs text-purple-300/80 italic font-mono flex items-center gap-1">
                     <span id="statusMessage">nothing..........</span><span class="cursor-blink opacity-75"></span>
                 </p>
 
-                <!-- 背景音樂控制按鈕 -->
-                <div class="pt-2 border-t border-white/5 flex items-center justify-between">
-                    <div class="flex items-center space-x-4 text-gray-400 text-lg">
-                        <a href="#" class="social-icon-glow hover:text-green-400"><i class="fa-brands fa-spotify"></i></a>
-                        <a href="#" class="social-icon-glow hover:text-red-500"><i class="fa-brands fa-youtube"></i></a>
-                        <a href="#" class="social-icon-glow hover:text-white"><i class="fa-brands fa-github"></i></a>
-                        <a href="#" class="social-icon-glow hover:text-indigo-400"><i class="fa-brands fa-discord"></i></a>
-                    </div>
-                    <!-- 音樂播放按鈕 -->
-                    <button id="musicToggleBtn" onclick="toggleMusic()" class="flex items-center gap-2 text-xs font-mono px-3 py-1.5 rounded-lg bg-purple-600/30 border border-purple-500/40 text-purple-200 hover:bg-purple-600/50 transition-all">
-                        <i id="musicIcon" class="fa-solid fa-music"></i>
-                        <span id="musicText">Play Music</span>
-                    </button>
+                <!-- 社交平台連結列 -->
+                <div class="pt-2 border-t border-white/5 flex items-center justify-center space-x-6 text-gray-400 text-lg">
+                    <a href="#" class="social-icon-glow hover:text-red-500"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="social-icon-glow hover:text-green-400"><i class="fa-brands fa-spotify"></i></a>
+                    <a href="#" class="social-icon-glow hover:text-white"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="social-icon-glow hover:text-indigo-400"><i class="fa-brands fa-discord"></i></a>
                 </div>
             </div>
 
         </section>
 
-        <!-- 右側：動態影片輪播區塊 (佔 7 欄) -->
+        <!-- 右側：影片輪播區塊 (佔 7 欄) -->
         <section class="lg:col-span-7 flex flex-col items-center justify-center relative mt-4 lg:mt-0">
             
             <!-- 影片堆疊容器 -->
@@ -345,54 +335,25 @@
 
     </main>
 
-    <!-- Toast 提示彈窗 (複製 Discord 提示) -->
+    <!-- Toast 複製成功提示 -->
     <div id="toast" class="fixed bottom-6 right-6 bg-purple-600 text-white px-5 py-3 rounded-xl shadow-2xl opacity-0 translate-y-4 pointer-events-none z-50 flex items-center gap-3">
         <i class="fa-solid fa-circle-check"></i>
-        <span>Discord ID 已複製到剪貼簿！</span>
+        <span>Discord ID (shshnzj1236) 已複製！</span>
     </div>
 
-    <!-- JavaScript 腳本邏輯 -->
+    <!-- JavaScript 腳本區塊 -->
     <script>
         // ==========================================
-        // 1. 背景音樂設定 (在此替換為你要的音樂網址或檔名)
-        // ==========================================
-        const bgmUrl = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'; 
-
-        const audioPlayer = document.getElementById('bgmAudio');
-        audioPlayer.src = bgmUrl;
-        let isPlaying = false;
-
-        function toggleMusic() {
-            const musicIcon = document.getElementById('musicIcon');
-            const musicText = document.getElementById('musicText');
-
-            if (isPlaying) {
-                audioPlayer.pause();
-                musicIcon.className = "fa-solid fa-music";
-                musicText.textContent = "Play Music";
-                isPlaying = false;
-            } else {
-                audioPlayer.play().then(() => {
-                    musicIcon.className = "fa-solid fa-pause text-purple-400";
-                    musicText.textContent = "Playing...";
-                    isPlaying = true;
-                }).catch(err => {
-                    console.log("Audio playback error: ", err);
-                });
-            }
-        }
-
-        // ==========================================
-        // 2. 影片輪播設定 (在此替換為你要的影片網址與標題)
+        // 1. 影片輪播設定 (包含您的 Discord MP4 影片)
         // ==========================================
         const galleryVideos = [
             {
-                src: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-on-a-road-at-sunset-17367-large.mp4',
-                title: 'Sunset Driving Shot'
+                src: 'https://cdn.discordapp.com/attachments/1014411791981346866/1556156858044256307/video.mp4?ex=6ac32382&is=6ac1d202&hm=b3ebd07cea89e7ae389a2028fe7b4cfee12741573728affd82bb119c4122af1f&',
+                title: 'Featured Showcase Video'
             },
             {
-                src: 'https://assets.mixkit.co/videos/preview/mixkit-hands-holding-a-smartphone-playing-a-game-41525-large.mp4',
-                title: 'Gaming Scene'
+                src: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-on-a-road-at-sunset-17367-large.mp4',
+                title: 'Sunset Driving Shot'
             },
             {
                 src: 'https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-sports-car-driving-on-a-curved-road-41551-large.mp4',
@@ -412,7 +373,7 @@
                 if (videoEl.src !== videoData.src) {
                     videoEl.src = videoData.src;
                     videoEl.load();
-                    videoEl.play().catch(() => {}); // 靜音自動播放
+                    videoEl.play().catch(() => {});
                 }
 
                 if (i === 0) {
@@ -443,10 +404,23 @@
         updateGallery();
 
         // ==========================================
-        // 3. 打字機要顯示的動態文字
+        // 2. ABOUT ME 區塊動態打字效果
         // ==========================================
-        const typingPhrases = ["Developer & Photographer", "FiveM Customizer", "Car Photography Enthusiast"];
+        const aboutMePhrase = "I'm really into FiveM, car photography, and technical platform customization. Always crafting immersive visuals and exploring new digital aesthetics.";
+        let aboutMeCharIdx = 0;
+        const aboutMeEl = document.getElementById('aboutMeText');
 
+        function typeAboutMe() {
+            if (aboutMeCharIdx < aboutMePhrase.length) {
+                aboutMeEl.textContent += aboutMePhrase.charAt(aboutMeCharIdx);
+                aboutMeCharIdx++;
+                setTimeout(typeAboutMe, 30);
+            }
+        }
+        typeAboutMe();
+
+        // 稱號動態打字機效果
+        const typingPhrases = ["Developer & Photographer", "FiveM Customizer", "Car Photography Enthusiast"];
         let phraseIdx = 0;
         let charIdx = 0;
         let isDeleting = false;
@@ -477,7 +451,7 @@
         }
         typeLoop();
 
-        // STATUS 區塊打字機效果
+        // STATUS 動態切換文字
         const statusPhrases = [
             "nothing..........",
             "Coding FiveM scripts...",
@@ -515,9 +489,9 @@
         }
         statusTypeLoop();
 
-        // 複製 Discord
+        // 複製 Discord 名稱 (shshnzj1236)
         function copyDiscord() {
-            navigator.clipboard.writeText("z_master");
+            navigator.clipboard.writeText("shshnzj1236");
             const toast = document.getElementById('toast');
             toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
             setTimeout(() => {
@@ -526,7 +500,7 @@
         }
 
         // ==========================================
-        // 4. Canvas 背景閃電與光點粒子動畫
+        // 3. Canvas 背景閃電與光點特效
         // ==========================================
         const canvas = document.getElementById('lightningCanvas');
         const ctx = canvas.getContext('2d');
