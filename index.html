@@ -343,235 +343,251 @@
 
     <!-- JavaScript 腳本區塊 -->
     <script>
-        // ==========================================
-        // 1. 影片輪播設定
-        // ==========================================
-        const galleryVideos = [
-            {
-                src: 'https://cdn.discordapp.com/attachments/1014411791981346866/1556156858044256307/video.mp4?ex=6ac32382&is=6ac1d202&hm=b3ebd07cea89e7ae389a2028fe7b4cfee12741573728affd82bb119c4122af1f&',
-                title: 'Featured Showcase Video'
-            },
-            {
-                src: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-on-a-road-at-sunset-17367-large.mp4',
-                title: 'Sunset Driving Shot'
-            },
-            {
-                src: 'https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-sports-car-driving-on-a-curved-road-41551-large.mp4',
-                title: 'Aerial Car Cinematic'
-            }
-        ];
+        // 全域聲明切換函數供 HTML 按鈕使用
+        let nextSlide, prevSlide, copyDiscord;
 
-        let currentIndex = 0;
+        document.addEventListener('DOMContentLoaded', () => {
 
-        function updateGallery() {
-            const total = galleryVideos.length;
-            for (let i = 0; i < 3; i++) {
-                const videoEl = document.getElementById(`video${i}`);
-                const videoIndex = (currentIndex + i) % total;
-                const videoData = galleryVideos[videoIndex];
+            // ==========================================
+            // 1. ABOUT ME 區塊動態打字效果
+            // ==========================================
+            const aboutMePhrase = "FiveM Sin City 娛樂服服主。致力於打造最酷炫的獨家腳本、流暢的伺服器體驗與優質社群氛圍。歡迎加入 Sin City 點燃你的罪惡之城之旅！";
+            let aboutMeCharIdx = 0;
+            const aboutMeEl = document.getElementById('aboutMeText');
 
-                if (videoEl.src !== videoData.src) {
-                    videoEl.src = videoData.src;
-                    videoEl.load();
-                    videoEl.play().catch(() => {});
-                }
-
-                if (i === 0) {
-                    document.getElementById('caption0').textContent = videoData.title;
+            function typeAboutMe() {
+                if (aboutMeEl && aboutMeCharIdx < aboutMePhrase.length) {
+                    aboutMeEl.textContent += aboutMePhrase.charAt(aboutMeCharIdx);
+                    aboutMeCharIdx++;
+                    setTimeout(typeAboutMe, 30);
                 }
             }
+            typeAboutMe();
 
-            // 更新指示燈
-            const dotsContainer = document.getElementById('dots');
-            dotsContainer.innerHTML = '';
-            galleryVideos.forEach((_, idx) => {
-                const dot = document.createElement('div');
-                dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-purple-500 w-6' : 'bg-white/30'}`;
-                dotsContainer.appendChild(dot);
-            });
-        }
+            // 稱號動態打字機效果
+            const typingPhrases = ["Sin City 娛樂服 | 服主 🏙️"];
+            let phraseIdx = 0;
+            let charIdx = 0;
+            let isDeleting = false;
+            const typingEl = document.getElementById('typingText');
 
-        function nextSlide() {
-            currentIndex = (currentIndex + 1) % galleryVideos.length;
+            function typeLoop() {
+                if (!typingEl) return;
+                const currentPhrase = typingPhrases[phraseIdx];
+                if (isDeleting) {
+                    typingEl.textContent = currentPhrase.substring(0, charIdx - 1);
+                    charIdx--;
+                } else {
+                    typingEl.textContent = currentPhrase.substring(0, charIdx + 1);
+                    charIdx++;
+                }
+
+                let typeSpeed = isDeleting ? 40 : 80;
+
+                if (!isDeleting && charIdx === currentPhrase.length) {
+                    typeSpeed = 2000;
+                    isDeleting = true;
+                } else if (isDeleting && charIdx === 0) {
+                    isDeleting = false;
+                    phraseIdx = (phraseIdx + 1) % typingPhrases.length;
+                    typeSpeed = 500;
+                }
+
+                setTimeout(typeLoop, typeSpeed);
+            }
+            typeLoop();
+
+            // STATUS 動態切換文字
+            const statusPhrases = [
+                "nothing..........",
+                "Coding FiveM scripts...",
+                "Editing vehicle shots 📸",
+                "Online on Discord 💬"
+            ];
+
+            let statusIdx = 0;
+            let statusCharIdx = 0;
+            let isStatusDeleting = false;
+            const statusEl = document.getElementById('statusMessage');
+
+            function statusTypeLoop() {
+                if (!statusEl) return;
+                const currentStatus = statusPhrases[statusIdx];
+                if (isStatusDeleting) {
+                    statusEl.textContent = currentStatus.substring(0, statusCharIdx - 1);
+                    statusCharIdx--;
+                } else {
+                    statusEl.textContent = currentStatus.substring(0, statusCharIdx + 1);
+                    statusCharIdx++;
+                }
+
+                let speed = isStatusDeleting ? 30 : 70;
+
+                if (!isStatusDeleting && statusCharIdx === currentStatus.length) {
+                    speed = 2500;
+                    isStatusDeleting = true;
+                } else if (isStatusDeleting && statusCharIdx === 0) {
+                    isStatusDeleting = false;
+                    statusIdx = (statusIdx + 1) % statusPhrases.length;
+                    speed = 400;
+                }
+
+                setTimeout(statusTypeLoop, speed);
+            }
+            statusTypeLoop();
+
+            // 複製 Discord 名稱 (shshnzj1236)
+            copyDiscord = function() {
+                navigator.clipboard.writeText("shshnzj1236");
+                const toast = document.getElementById('toast');
+                if (toast) {
+                    toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+                    setTimeout(() => {
+                        toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+                    }, 2500);
+                }
+            };
+
+            // ==========================================
+            // 2. 影片輪播設定 (加上例外捕捉機制)
+            // ==========================================
+            const galleryVideos = [
+                {
+                    src: 'https://assets.mixkit.co/videos/preview/mixkit-car-driving-on-a-road-at-sunset-17367-large.mp4',
+                    title: 'Featured Showcase Video'
+                },
+                {
+                    src: 'https://assets.mixkit.co/videos/preview/mixkit-top-view-of-a-sports-car-driving-on-a-curved-road-41551-large.mp4',
+                    title: 'Aerial Car Cinematic'
+                }
+            ];
+
+            let currentIndex = 0;
+
+            function updateGallery() {
+                const total = galleryVideos.length;
+                if (total === 0) return;
+
+                for (let i = 0; i < 3; i++) {
+                    const videoEl = document.getElementById(`video${i}`);
+                    if (!videoEl) continue;
+
+                    const videoIndex = (currentIndex + i) % total;
+                    const videoData = galleryVideos[videoIndex];
+
+                    if (videoEl.getAttribute('data-src') !== videoData.src) {
+                        videoEl.setAttribute('data-src', videoData.src);
+                        videoEl.src = videoData.src;
+                        videoEl.load();
+                        videoEl.play().catch(() => {});
+                    }
+
+                    if (i === 0) {
+                        const caption = document.getElementById('caption0');
+                        if (caption) caption.textContent = videoData.title;
+                    }
+                }
+
+                // 更新指示燈
+                const dotsContainer = document.getElementById('dots');
+                if (dotsContainer) {
+                    dotsContainer.innerHTML = '';
+                    galleryVideos.forEach((_, idx) => {
+                        const dot = document.createElement('div');
+                        dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-purple-500 w-6' : 'bg-white/30'}`;
+                        dotsContainer.appendChild(dot);
+                    });
+                }
+            }
+
+            nextSlide = function() {
+                currentIndex = (currentIndex + 1) % galleryVideos.length;
+                updateGallery();
+            };
+
+            prevSlide = function() {
+                currentIndex = (currentIndex - 1 + galleryVideos.length) % galleryVideos.length;
+                updateGallery();
+            };
+
             updateGallery();
-        }
 
-        function prevSlide() {
-            currentIndex = (currentIndex - 1 + galleryVideos.length) % galleryVideos.length;
-            updateGallery();
-        }
+            // ==========================================
+            // 3. Canvas 背景閃電與光點特效
+            // ==========================================
+            const canvas = document.getElementById('lightningCanvas');
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
 
-        updateGallery();
+                function resizeCanvas() {
+                    canvas.width = window.innerWidth;
+                    canvas.height = window.innerHeight;
+                }
+                window.addEventListener('resize', resizeCanvas);
+                resizeCanvas();
 
-        // ==========================================
-        // 2. ABOUT ME 區塊動態打字效果
-        // ==========================================
-        const aboutMePhrase = "FiveM Sin City 娛樂服服主。致力於打造最酷炫的獨家腳本、流暢的伺服器體驗與優質社群氛圍。歡迎加入 Sin City 點燃你的罪惡之城之旅！";
-        let aboutMeCharIdx = 0;
-        const aboutMeEl = document.getElementById('aboutMeText');
+                const particles = Array.from({ length: 45 }, () => ({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    speedY: Math.random() * 0.5 + 0.1,
+                    opacity: Math.random()
+                }));
 
-        function typeAboutMe() {
-            if (aboutMeCharIdx < aboutMePhrase.length) {
-                aboutMeEl.textContent += aboutMePhrase.charAt(aboutMeCharIdx);
-                aboutMeCharIdx++;
-                setTimeout(typeAboutMe, 30);
+                let lightning = [];
+                function createLightning() {
+                    const startX = canvas.width / 2 + (Math.random() - 0.5) * 400;
+                    let currentX = startX;
+                    let currentY = 0;
+                    const segments = [];
+
+                    while (currentY < canvas.height) {
+                        const nextX = currentX + (Math.random() - 0.5) * 50;
+                        const nextY = currentY + Math.random() * 30 + 10;
+                        segments.push({ x1: currentX, y1: currentY, x2: nextX, y2: nextY });
+                        currentX = nextX;
+                        currentY = nextY;
+                    }
+                    return { segments, opacity: 1 };
+                }
+
+                function animateCanvas() {
+                    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                    particles.forEach(p => {
+                        p.y -= p.speedY;
+                        if (p.y < 0) p.y = canvas.height;
+                        ctx.fillStyle = `rgba(168, 85, 247, ${p.opacity})`;
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                        ctx.fill();
+                    });
+
+                    if (Math.random() < 0.015 && lightning.length === 0) {
+                        lightning.push(createLightning());
+                    }
+
+                    lightning.forEach((l, index) => {
+                        ctx.strokeStyle = `rgba(147, 197, 253, ${l.opacity})`;
+                        ctx.lineWidth = 2;
+                        ctx.shadowBlur = 15;
+                        ctx.shadowColor = '#3b82f6';
+                        ctx.beginPath();
+                        l.segments.forEach(s => {
+                            ctx.moveTo(s.x1, s.y1);
+                            ctx.lineTo(s.x2, s.y2);
+                        });
+                        ctx.stroke();
+                        l.opacity -= 0.05;
+                        if (l.opacity <= 0) lightning.splice(index, 1);
+                    });
+
+                    requestAnimationFrame(animateCanvas);
+                }
+
+                animateCanvas();
             }
-        }
-        typeAboutMe();
-
-        // 稱號動態打字機效果
-        const typingPhrases = ["Sin City 娛樂服 | 服主 🏙️"];
-        let phraseIdx = 0;
-        let charIdx = 0;
-        let isDeleting = false;
-        const typingEl = document.getElementById('typingText');
-
-        function typeLoop() {
-            const currentPhrase = typingPhrases[phraseIdx];
-            if (isDeleting) {
-                typingEl.textContent = currentPhrase.substring(0, charIdx - 1);
-                charIdx--;
-            } else {
-                typingEl.textContent = currentPhrase.substring(0, charIdx + 1);
-                charIdx++;
-            }
-
-            let typeSpeed = isDeleting ? 40 : 80;
-
-            if (!isDeleting && charIdx === currentPhrase.length) {
-                typeSpeed = 2000;
-                isDeleting = true;
-            } else if (isDeleting && charIdx === 0) {
-                isDeleting = false;
-                phraseIdx = (phraseIdx + 1) % typingPhrases.length;
-                typeSpeed = 500;
-            }
-
-            setTimeout(typeLoop, typeSpeed);
-        }
-        typeLoop();
-
-        // STATUS 動態切換文字
-        const statusPhrases = [
-            "nothing..........",
-            "Coding FiveM scripts...",
-            "Editing vehicle shots 📸",
-            "Online on Discord 💬"
-        ];
-
-        let statusIdx = 0;
-        let statusCharIdx = 0;
-        let isStatusDeleting = false;
-        const statusEl = document.getElementById('statusMessage');
-
-        function statusTypeLoop() {
-            const currentStatus = statusPhrases[statusIdx];
-            if (isStatusDeleting) {
-                statusEl.textContent = currentStatus.substring(0, statusCharIdx - 1);
-                statusCharIdx--;
-            } else {
-                statusEl.textContent = currentStatus.substring(0, statusCharIdx + 1);
-                statusCharIdx++;
-            }
-
-            let speed = isStatusDeleting ? 30 : 70;
-
-            if (!isStatusDeleting && statusCharIdx === currentStatus.length) {
-                speed = 2500;
-                isStatusDeleting = true;
-            } else if (isStatusDeleting && statusCharIdx === 0) {
-                isStatusDeleting = false;
-                statusIdx = (statusIdx + 1) % statusPhrases.length;
-                speed = 400;
-            }
-
-            setTimeout(statusTypeLoop, speed);
-        }
-        statusTypeLoop();
-
-        // 複製 Discord 名稱 (shshnzj1236)
-        function copyDiscord() {
-            navigator.clipboard.writeText("shshnzj1236");
-            const toast = document.getElementById('toast');
-            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
-            setTimeout(() => {
-                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
-            }, 2500);
-        }
-
-        // ==========================================
-        // 3. Canvas 背景閃電與光點特效
-        // ==========================================
-        const canvas = document.getElementById('lightningCanvas');
-        const ctx = canvas.getContext('2d');
-
-        function resizeCanvas() {
-            canvas.width = window.innerWidth;
-            canvas.height = window.innerHeight;
-        }
-        window.addEventListener('resize', resizeCanvas);
-        resizeCanvas();
-
-        const particles = Array.from({ length: 45 }, () => ({
-            x: Math.random() * canvas.width,
-            y: Math.random() * canvas.height,
-            size: Math.random() * 2 + 0.5,
-            speedY: Math.random() * 0.5 + 0.1,
-            opacity: Math.random()
-        }));
-
-        let lightning = [];
-        function createLightning() {
-            const startX = canvas.width / 2 + (Math.random() - 0.5) * 400;
-            let currentX = startX;
-            let currentY = 0;
-            const segments = [];
-
-            while (currentY < canvas.height) {
-                const nextX = currentX + (Math.random() - 0.5) * 50;
-                const nextY = currentY + Math.random() * 30 + 10;
-                segments.push({ x1: currentX, y1: currentY, x2: nextX, y2: nextY });
-                currentX = nextX;
-                currentY = nextY;
-            }
-            return { segments, opacity: 1 };
-        }
-
-        function animateCanvas() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-            particles.forEach(p => {
-                p.y -= p.speedY;
-                if (p.y < 0) p.y = canvas.height;
-                ctx.fillStyle = `rgba(168, 85, 247, ${p.opacity})`;
-                ctx.beginPath();
-                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-                ctx.fill();
-            });
-
-            if (Math.random() < 0.015 && lightning.length === 0) {
-                lightning.push(createLightning());
-            }
-
-            lightning.forEach((l, index) => {
-                ctx.strokeStyle = `rgba(147, 197, 253, ${l.opacity})`;
-                ctx.lineWidth = 2;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#3b82f6';
-                ctx.beginPath();
-                l.segments.forEach(s => {
-                    ctx.moveTo(s.x1, s.y1);
-                    ctx.lineTo(s.x2, s.y2);
-                });
-                ctx.stroke();
-                l.opacity -= 0.05;
-                if (l.opacity <= 0) lightning.splice(index, 1);
-            });
-
-            requestAnimationFrame(animateCanvas);
-        }
-
-        animateCanvas();
+        });
     </script>
 </body>
 </html>
