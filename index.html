@@ -13,199 +13,290 @@
                 extend: {
                     colors: {
                         brand: {
-                            purple: '#8b5cf6',
+                            purple: '#a855f7',
                             blue: '#3b82f6',
-                            dark: '#0a0d14',
-                            card: 'rgba(18, 22, 33, 0.75)'
+                            cyan: '#06b6d4',
+                            dark: '#05070f',
+                            card: 'rgba(15, 23, 42, 0.75)'
                         }
                     },
                     fontFamily: {
                         sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace']
                     }
                 }
             }
         }
     </script>
-    <!-- FontAwesome for Icons -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700;800&display=swap" rel="stylesheet">
     
-    <!-- Custom Glassmorphism and Effects Styles -->
     <style>
         body {
-            background-color: #06080e;
-            color: #e2e8f0;
             font-family: 'Inter', sans-serif;
+            background-color: #030712;
+            color: #f3f4f6;
             overflow-x: hidden;
         }
 
-        .glass-card {
-            background: rgba(15, 18, 28, 0.65);
+        /* 玻璃擬態 */
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(168, 85, 247, 0.15);
         }
 
-        .glass-inner {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+        /* 背景星雲閃爍動畫 */
+        .nebula-bg {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(90px);
+            opacity: 0.45;
+            animation: floatNebula 12s ease-in-out infinite alternate;
         }
 
-        /* Lightning Canvas background */
-        #lightningCanvas {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            z-index: 0;
-            pointer-events: none;
+        @keyframes floatNebula {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(30px, -40px) scale(1.15); }
+            100% { transform: translate(-20px, 30px) scale(0.95); }
         }
 
-        /* Glow effects */
+        /* 頭像霓虹光圈旋轉動畫 */
         .avatar-glow {
-            box-shadow: 0 0 20px rgba(139, 92, 246, 0.6), 0 0 40px rgba(59, 130, 246, 0.3);
+            position: relative;
+        }
+        .avatar-glow::before {
+            content: '';
+            position: absolute;
+            inset: -4px;
+            border-radius: 1.25rem;
+            background: linear-gradient(45deg, #a855f7, #3b82f6, #06b6d4, #a855f7);
+            background-size: 300% 300%;
+            z-index: -1;
+            animation: glowRotate 6s linear infinite;
+            filter: blur(8px);
+            opacity: 0.85;
         }
 
-        .btn-glow:hover {
-            box-shadow: 0 0 15px rgba(59, 130, 246, 0.4);
+        @keyframes glowRotate {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
+        /* 按鈕光芒流動動畫 */
+        .btn-shimmer {
+            position: relative;
+            overflow: hidden;
         }
-        ::-webkit-scrollbar-track {
-            background: #06080e;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 3px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #334155;
+        .btn-shimmer::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(
+                60deg,
+                transparent 30%,
+                rgba(255, 255, 255, 0.15) 50%,
+                transparent 70%
+            );
+            transform: rotate(30deg);
+            animation: shimmerMove 4s infinite;
         }
 
-        /* Interactive stacked card styles */
+        @keyframes shimmerMove {
+            0% { transform: translate(-100%, -100%) rotate(30deg); }
+            100% { transform: translate(100%, 100%) rotate(30deg); }
+        }
+
+        /* 打字機游標閃爍 */
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 1em;
+            background-color: #a855f7;
+            vertical-align: middle;
+            animation: blink 0.8s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 相冊堆疊與動畫 */
+        .stack-container {
+            position: relative;
+            perspective: 1000px;
+        }
+
         .stack-card {
             transition: all 0.5s cubic-bezier(0.25, 1, 0.5, 1);
+            transform-style: preserve-3d;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+        }
+
+        .stack-card.pos-0 {
+            transform: translateZ(0px) translateY(0px) rotate(0deg);
+            z-index: 30;
+            opacity: 1;
+        }
+
+        .stack-card.pos-1 {
+            transform: translateZ(-40px) translateY(18px) translateX(25px) rotate(3deg);
+            z-index: 20;
+            opacity: 0.85;
+        }
+
+        .stack-card.pos-2 {
+            transform: translateZ(-80px) translateY(36px) translateX(50px) rotate(6deg);
+            z-index: 10;
+            opacity: 0.65;
+        }
+
+        /* Toast 提示彈窗 */
+        #toast {
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
     </style>
 </head>
-<body class="min-h-screen flex items-center justify-center p-4 md:p-8 relative select-none">
+<body class="min-h-screen flex items-center justify-center relative p-4 md:p-8 select-none">
 
-    <!-- Background Animated Canvas -->
-    <canvas id="lightningCanvas"></canvas>
+    <!-- 背景動態閃電與粒子 Canvas -->
+    <canvas id="lightningCanvas" class="fixed inset-0 pointer-events-none z-0"></canvas>
 
-    <!-- Main Container Layout -->
-    <main class="relative z-10 w-full max-w-7xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center min-h-[85vh]">
-        
-        <!-- LEFT PANEL: Profile & Bio Card (5 columns on large screens) -->
-        <section class="lg:col-span-5 w-full">
-            <div class="glass-card rounded-3xl p-6 sm:p-8 flex flex-col gap-6 relative overflow-hidden group">
-                <!-- Top Decorative Glow -->
-                <div class="absolute -top-24 -left-24 w-48 h-48 bg-purple-600/20 rounded-full blur-3xl pointer-events-none"></div>
-                <div class="absolute -bottom-24 -right-24 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+    <!-- 背景彩虹星雲懸浮暈光 -->
+    <div class="nebula-bg bg-purple-600 w-96 h-96 top-10 left-10 z-0"></div>
+    <div class="nebula-bg bg-blue-600 w-96 h-96 bottom-10 right-10 z-0" style="animation-delay: -6s;"></div>
 
-                <!-- Profile Header -->
-                <div class="flex items-center gap-5">
-                    <div class="relative">
-                        <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=200&q=80" 
-                             alt="Avatar" 
-                             class="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl object-cover avatar-glow border-2 border-purple-500/50">
-                        <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-slate-900 rounded-full" title="Online"></div>
-                    </div>
-                    <div>
-                        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-wide text-white flex items-center gap-2">
-                            Mr 𝓩
-                        </h1>
-                        <p class="text-xs text-purple-400/80 font-mono tracking-wider mt-0.5">v / Developer & Photographer</p>
-                    </div>
+    <!-- 主要內容區塊容器 -->
+    <main class="relative z-10 w-full max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+
+        <!-- 左側：個人資料卡片 (佔 5 欄) -->
+        <section class="lg:col-span-5 glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden transform hover:-translate-y-1 transition-all duration-300">
+            
+            <!-- 個人頭像與標題區塊 -->
+            <div class="flex items-center space-x-5 mb-6">
+                <!-- 霓虹頭像框 -->
+                <div class="relative avatar-glow flex-shrink-0">
+                    <img id="userAvatar" src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=250&q=80" 
+                         alt="Mr 𝓩 Avatar" 
+                         class="w-20 h-20 md:w-22 md:h-22 object-cover rounded-2xl border border-white/20">
+                    <!-- 在線狀態指示點 (脈衝動畫) -->
+                    <span class="absolute -bottom-1 -right-1 w-5 h-5 bg-emerald-500 border-2 border-slate-900 rounded-full flex items-center justify-center">
+                        <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    </span>
                 </div>
 
-                <!-- About Me Section -->
-                <div class="space-y-2">
-                    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                        <i class="fa-solid fa-user text-purple-400"></i> About me:
-                    </h2>
-                    <p class="text-sm text-slate-300 leading-relaxed font-normal">
-                        I'm really into FiveM, car photography, and technical platform customization. Always crafting immersive visuals and exploring new digital aesthetics.
+                <!-- 名字與稱號 -->
+                <div>
+                    <h1 class="text-3xl font-extrabold text-white tracking-wide flex items-center gap-2">
+                        Mr 𝓩
+                    </h1>
+                    <!-- 打字機動態稱號 -->
+                    <p class="text-xs font-mono text-purple-400 mt-1">
+                        <span id="typingText"></span><span class="cursor-blink"></span>
                     </p>
                 </div>
-
-                <!-- Contact Information Section -->
-                <div class="space-y-3">
-                    <h2 class="text-xs font-semibold uppercase tracking-wider text-slate-400 flex items-center gap-2">
-                        <i class="fa-solid fa-address-card text-blue-400"></i> Contact Information:
-                    </h2>
-                    
-                    <!-- Discord Tag Button -->
-                    <div class="glass-inner rounded-xl p-3 flex items-center justify-between text-sm text-slate-200 transition hover:bg-white/5 cursor-pointer group/btn" onclick="copyDiscord()">
-                        <div class="flex items-center gap-3">
-                            <i class="fa-brands fa-discord text-indigo-400 text-lg"></i>
-                            <span class="font-medium text-xs sm:text-sm">Discord: <span class="text-slate-100 font-semibold">z_master</span></span>
-                        </div>
-                        <span id="copyNotice" class="text-xs text-slate-400 group-hover/btn:text-white transition-colors">
-                            <i class="fa-regular fa-copy"></i>
-                        </span>
-                    </div>
-
-                    <!-- Join My Server Button -->
-                    <a href="#" onclick="alertNotice('Discord Server', 'Redirecting to Discord Server...')" class="glass-inner rounded-xl p-3 flex items-center gap-3 text-sm text-slate-200 transition hover:bg-emerald-500/10 hover:border-emerald-500/30 group/srv">
-                        <i class="fa-solid fa-server text-emerald-400 text-lg"></i>
-                        <span class="font-medium text-xs sm:text-sm text-emerald-300 group-hover/srv:text-emerald-200">Join my server</span>
-                        <i class="fa-solid fa-arrow-right text-xs text-emerald-400/50 ml-auto group-hover/srv:translate-x-1 transition-transform"></i>
-                    </a>
-                </div>
-
-                <!-- Extra Custom Box ("blablabla") -->
-                <div class="glass-inner rounded-2xl p-4 space-y-3 border border-white/5">
-                    <div class="flex justify-between items-center">
-                        <span class="text-xs font-semibold text-slate-400 tracking-wider">blablabla</span>
-                        <span class="text-[10px] text-slate-500">STATUS</span>
-                    </div>
-                    <p class="text-xs text-slate-400 italic">nothing.........</p>
-                    
-                    <!-- Social Links Icons -->
-                    <div class="flex items-center gap-4 pt-2 border-t border-white/5 text-slate-400 text-lg">
-                        <a href="#" class="hover:text-green-400 transition-colors" title="Spotify" onclick="alertNotice('Spotify', 'Opening Spotify profile...')">
-                            <i class="fa-brands fa-spotify"></i>
-                        </a>
-                        <a href="#" class="hover:text-red-500 transition-colors" title="YouTube" onclick="alertNotice('YouTube', 'Opening YouTube channel...')">
-                            <i class="fa-brands fa-youtube"></i>
-                        </a>
-                        <a href="#" class="hover:text-white transition-colors" title="GitHub" onclick="alertNotice('GitHub', 'Opening GitHub profile...')">
-                            <i class="fa-brands fa-github"></i>
-                        </a>
-                        <a href="#" class="hover:text-indigo-400 transition-colors" title="Discord Community" onclick="alertNotice('Discord', 'Opening Discord...')">
-                            <i class="fa-brands fa-discord"></i>
-                        </a>
-                    </div>
-                </div>
-
             </div>
+
+            <!-- 關於我 (About Me) -->
+            <div class="mb-6">
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <i class="fa-solid font-bold fa-user text-purple-400"></i> ABOUT ME:
+                </h2>
+                <p class="text-sm text-gray-300 leading-relaxed font-normal">
+                    I'm really into FiveM, car photography, and technical platform customization. Always crafting immersive visuals and exploring new digital aesthetics.
+                </p>
+            </div>
+
+            <!-- 聯絡方式區塊 (Contact Information) -->
+            <div class="mb-6 space-y-3">
+                <h2 class="text-xs font-semibold text-gray-400 uppercase tracking-widest mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-address-card text-blue-400"></i> CONTACT INFORMATION:
+                </h2>
+
+                <!-- Discord 點擊複製按鈕 -->
+                <div onclick="copyDiscord()" class="btn-shimmer flex items-center justify-between p-3.5 rounded-xl bg-slate-800/60 border border-white/10 hover:border-purple-500/50 hover:bg-slate-800/90 transition-all cursor-pointer group">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-brands fa-discord text-xl text-indigo-400 group-hover:scale-110 transition-transform"></i>
+                        <span class="text-sm font-medium text-gray-200">Discord: <strong class="text-white">z_master</strong></span>
+                    </div>
+                    <i class="fa-regular fa-copy text-gray-400 group-hover:text-purple-400 transition-colors"></i>
+                </div>
+
+                <!-- Join My Server 按鈕 -->
+                <a href="#" target="_blank" class="btn-shimmer flex items-center justify-between p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/30 hover:border-emerald-400 hover:bg-emerald-900/40 transition-all text-emerald-400 font-medium group">
+                    <div class="flex items-center space-x-3">
+                        <i class="fa-solid fa-server text-emerald-400 group-hover:rotate-12 transition-transform"></i>
+                        <span class="text-sm">Join my server</span>
+                    </div>
+                    <i class="fa-solid fa-arrow-right text-xs group-hover:translate-x-1 transition-transform"></i>
+                </a>
+            </div>
+
+            <!-- 自訂備註與社交圖示區塊 -->
+            <div class="p-4 rounded-2xl bg-slate-900/60 border border-white/5 space-y-3">
+                <div class="flex justify-between items-center text-xs text-gray-400">
+                    <span class="font-mono">blablabla</span>
+                    <span class="bg-purple-500/10 text-purple-400 px-2 py-0.5 rounded text-[10px] font-semibold border border-purple-500/20">STATUS</span>
+                </div>
+                <p class="text-xs text-gray-400 italic">nothing..........</p>
+
+                <div class="pt-2 border-t border-white/5 flex items-center space-x-4 text-gray-400 text-lg">
+                    <a href="#" class="hover:text-green-400 transition-colors"><i class="fa-brands fa-spotify"></i></a>
+                    <a href="#" class="hover:text-red-500 transition-colors"><i class="fa-brands fa-youtube"></i></a>
+                    <a href="#" class="hover:text-white transition-colors"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="hover:text-indigo-400 transition-colors"><i class="fa-brands fa-discord"></i></a>
+                </div>
+            </div>
+
         </section>
 
-        <!-- RIGHT PANEL: Interactive Stacked Gallery Showcase (7 columns) -->
-        <section class="lg:col-span-7 w-full flex flex-col items-center justify-center relative min-h-[420px] sm:min-h-[500px]">
+        <!-- 右側：動態相片輪播區塊 (佔 7 欄) -->
+        <section class="lg:col-span-7 flex flex-col items-center justify-center relative mt-4 lg:mt-0">
             
-            <!-- Stack Container -->
-            <div id="stackContainer" class="relative w-full max-w-xl h-[320px] sm:h-[400px] flex items-center justify-center">
-                <!-- Gallery Cards rendered dynamically via JS -->
+            <!-- 相片堆疊容器 -->
+            <div class="stack-container w-full max-w-lg h-[340px] md:h-[420px] flex items-center justify-center">
+                
+                <!-- 卡片 0 (最上層) -->
+                <div id="card0" onclick="nextSlide()" class="stack-card pos-0 absolute w-full h-full rounded-2xl overflow-hidden cursor-pointer border border-white/15">
+                    <img id="img0" src="" class="w-full h-full object-cover">
+                    <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent flex items-end p-6">
+                        <p class="text-white text-sm font-medium tracking-wide flex items-center gap-2">
+                            <i class="fa-solid fa-camera"></i> <span id="caption0">Shot Preview</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 卡片 1 (第二層) -->
+                <div id="card1" onclick="nextSlide()" class="stack-card pos-1 absolute w-full h-full rounded-2xl overflow-hidden cursor-pointer border border-white/10">
+                    <img id="img1" src="" class="w-full h-full object-cover">
+                </div>
+
+                <!-- 卡片 2 (第三層) -->
+                <div id="card2" onclick="nextSlide()" class="stack-card pos-2 absolute w-full h-full rounded-2xl overflow-hidden cursor-pointer border border-white/5">
+                    <img id="img2" src="" class="w-full h-full object-cover">
+                </div>
+
             </div>
 
-            <!-- Controls & Indicators -->
-            <div class="mt-6 flex items-center gap-6 z-20">
-                <button id="prevBtn" class="w-11 h-11 rounded-full glass-card hover:bg-white/10 flex items-center justify-center text-white transition active:scale-95 border border-white/10">
-                    <i class="fa-solid fa-chevron-left text-sm"></i>
+            <!-- 控制控制鈕與指示燈 -->
+            <div class="flex items-center space-x-6 mt-8 z-20">
+                <button onclick="prevSlide()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white hover:bg-purple-600 transition-all active:scale-95">
+                    <i class="fa-solid fa-chevron-left"></i>
                 </button>
-                <div id="dotsContainer" class="flex items-center gap-2"></div>
-                <button id="nextBtn" class="w-11 h-11 rounded-full glass-card hover:bg-white/10 flex items-center justify-center text-white transition active:scale-95 border border-white/10">
-                    <i class="fa-solid fa-chevron-right text-sm"></i>
+                <div id="dots" class="flex space-x-2"></div>
+                <button onclick="nextSlide()" class="w-10 h-10 rounded-full glass-panel flex items-center justify-center text-white hover:bg-purple-600 transition-all active:scale-95">
+                    <i class="fa-solid fa-chevron-right"></i>
                 </button>
             </div>
 
@@ -213,21 +304,109 @@
 
     </main>
 
-    <!-- Custom Toast Message Component -->
-    <div id="toast" class="fixed bottom-6 right-6 z-50 transform translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
-        <div class="glass-card border border-purple-500/30 px-5 py-3 rounded-2xl flex items-center gap-3 shadow-2xl">
-            <div id="toastIcon" class="w-8 h-8 rounded-full bg-purple-500/20 text-purple-400 flex items-center justify-center text-sm">
-                <i class="fa-solid fa-check"></i>
-            </div>
-            <div>
-                <h4 id="toastTitle" class="text-xs font-semibold text-white">Title</h4>
-                <p id="toastMessage" class="text-xs text-slate-300">Message details goes here.</p>
-            </div>
-        </div>
+    <!-- Toast 提示彈窗 (複製 Discord 提示) -->
+    <div id="toast" class="fixed bottom-6 right-6 bg-purple-600 text-white px-5 py-3 rounded-xl shadow-2xl opacity-0 translate-y-4 pointer-events-none z-50 flex items-center gap-3">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>Discord ID 已複製到剪貼簿！</span>
     </div>
 
+    <!-- JavaScript 腳本邏輯 -->
     <script>
-        /* --- 1. LIGHTNING CANVAS BACKGROUND --- */
+        /* ====================================================
+           【如何修改圖片與資料？】
+           你可以在下方直接修改圖片網址與打字機文字！
+        ==================================================== */
+
+        // 1. 右側相冊圖片網址列表（可自由增減或更換）
+        const galleryImages = [
+            'https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1200&q=80', // Porsche 跑車
+            'https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1200&q=80', // 超跑
+            'https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1200&q=80', // 夜晚街道攝影
+            'https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1200&q=80'  // 酷炫跑車
+        ];
+
+        // 2. 打字機要顯示的動態文字
+        const typingPhrases = ["v / Developer & Photographer", "FiveM Customizer", "Car Photography Enthusiast"];
+
+        /* ====================================================
+           系統自動邏輯（無需修改）
+        ==================================================== */
+
+        // 複製 Discord
+        function copyDiscord() {
+            navigator.clipboard.writeText("z_master");
+            const toast = document.getElementById('toast');
+            toast.classList.remove('opacity-0', 'translate-y-4', 'pointer-events-none');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-4', 'pointer-events-none');
+            }, 2500);
+        }
+
+        // 打字機效果
+        let phraseIdx = 0;
+        let charIdx = 0;
+        let isDeleting = false;
+        const typingEl = document.getElementById('typingText');
+
+        function typeLoop() {
+            const currentPhrase = typingPhrases[phraseIdx];
+            if (isDeleting) {
+                typingEl.textContent = currentPhrase.substring(0, charIdx - 1);
+                charIdx--;
+            } else {
+                typingEl.textContent = currentPhrase.substring(0, charIdx + 1);
+                charIdx++;
+            }
+
+            let typeSpeed = isDeleting ? 40 : 80;
+
+            if (!isDeleting && charIdx === currentPhrase.length) {
+                typeSpeed = 2000;
+                isDeleting = true;
+            } else if (isDeleting && charIdx === 0) {
+                isDeleting = false;
+                phraseIdx = (phraseIdx + 1) % typingPhrases.length;
+                typeSpeed = 500;
+            }
+
+            setTimeout(typeLoop, typeSpeed);
+        }
+        typeLoop();
+
+        // 相冊輪播控制
+        let currentIndex = 0;
+
+        function updateGallery() {
+            const total = galleryImages.length;
+            for (let i = 0; i < 3; i++) {
+                const imgEl = document.getElementById(`img${i}`);
+                const imgIndex = (currentIndex + i) % total;
+                imgEl.src = galleryImages[imgIndex];
+            }
+
+            // 更新指示燈
+            const dotsContainer = document.getElementById('dots');
+            dotsContainer.innerHTML = '';
+            galleryImages.forEach((_, idx) => {
+                const dot = document.createElement('div');
+                dot.className = `w-2.5 h-2.5 rounded-full transition-all duration-300 ${idx === currentIndex ? 'bg-purple-500 w-6' : 'bg-white/30'}`;
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function nextSlide() {
+            currentIndex = (currentIndex + 1) % galleryImages.length;
+            updateGallery();
+        }
+
+        function prevSlide() {
+            currentIndex = (currentIndex - 1 + galleryImages.length) % galleryImages.length;
+            updateGallery();
+        }
+
+        updateGallery();
+
+        // Canvas 背景閃電與光點粒子動畫
         const canvas = document.getElementById('lightningCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -238,228 +417,71 @@
         window.addEventListener('resize', resizeCanvas);
         resizeCanvas();
 
-        // Lightning bolt parameters
-        class Bolt {
-            constructor(x, y) {
-                this.x = x;
-                this.y = y;
-                this.path = [{x: x, y: y}];
-                this.alpha = 1;
-                this.generatePath();
+        // 浮動粒子
+        const particles = Array.from({ length: 45 }, () => ({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height,
+            size: Math.random() * 2 + 0.5,
+            speedY: Math.random() * 0.5 + 0.1,
+            opacity: Math.random()
+        }));
+
+        // 閃電繪製
+        let lightning = [];
+        function createLightning() {
+            const startX = canvas.width / 2 + (Math.random() - 0.5) * 400;
+            let currentX = startX;
+            let currentY = 0;
+            const segments = [];
+
+            while (currentY < canvas.height) {
+                const nextX = currentX + (Math.random() - 0.5) * 50;
+                const nextY = currentY + Math.random() * 30 + 10;
+                segments.push({ x1: currentX, y1: currentY, x2: nextX, y2: nextY });
+                currentX = nextX;
+                currentY = nextY;
             }
-
-            generatePath() {
-                let currentX = this.x;
-                let currentY = this.y;
-                while (currentY < canvas.height) {
-                    let nextX = currentX + (Math.random() - 0.5) * 40;
-                    let nextY = currentY + Math.random() * 25 + 10;
-                    this.path.push({x: nextX, y: nextY});
-                    currentX = nextX;
-                    currentY = nextY;
-                }
-            }
-
-            draw() {
-                if (this.alpha <= 0) return;
-                ctx.save();
-                ctx.beginPath();
-                ctx.moveTo(this.path[0].x, this.path[0].y);
-                for (let i = 1; i < this.path.length; i++) {
-                    ctx.lineTo(this.path[i].x, this.path[i].y);
-                }
-                ctx.strokeStyle = `rgba(120, 170, 255, ${this.alpha})`;
-                ctx.lineWidth = 2.5;
-                ctx.shadowBlur = 15;
-                ctx.shadowColor = '#3b82f6';
-                ctx.stroke();
-
-                // Core bright line
-                ctx.beginPath();
-                ctx.moveTo(this.path[0].x, this.path[0].y);
-                for (let i = 1; i < this.path.length; i++) {
-                    ctx.lineTo(this.path[i].x, this.path[i].y);
-                }
-                ctx.strokeStyle = `rgba(255, 255, 255, ${this.alpha * 0.9})`;
-                ctx.lineWidth = 1;
-                ctx.stroke();
-                ctx.restore();
-
-                this.alpha -= 0.035; // Fade speed
-            }
+            return { segments, opacity: 1 };
         }
 
-        let bolts = [];
-        let lastLightningTime = 0;
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        function animateCanvas(timestamp) {
-            // Dark gradient overlay to create trail effect
-            ctx.fillStyle = 'rgba(6, 8, 14, 0.25)';
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            // 繪製粒子
+            particles.forEach(p => {
+                p.y -= p.speedY;
+                if (p.y < 0) p.y = canvas.height;
+                ctx.fillStyle = `rgba(168, 85, 247, ${p.opacity})`;
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                ctx.fill();
+            });
 
-            // Randomly trigger central lightning strikes
-            if (timestamp - lastLightningTime > Math.random() * 2000 + 1000) {
-                const startX = canvas.width * 0.5 + (Math.random() - 0.5) * (canvas.width * 0.3);
-                bolts.push(new Bolt(startX, 0));
-                lastLightningTime = timestamp;
+            // 隨機觸發閃電
+            if (Math.random() < 0.015 && lightning.length === 0) {
+                lightning.push(createLightning());
             }
 
-            bolts.forEach((bolt, index) => {
-                bolt.draw();
-                if (bolt.alpha <= 0) bolts.splice(index, 1);
+            // 繪製閃電
+            lightning.forEach((l, index) => {
+                ctx.strokeStyle = `rgba(147, 197, 253, ${l.opacity})`;
+                ctx.lineWidth = 2;
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#3b82f6';
+                ctx.beginPath();
+                l.segments.forEach(s => {
+                    ctx.moveTo(s.x1, s.y1);
+                    ctx.lineTo(s.x2, s.y2);
+                });
+                ctx.stroke();
+                l.opacity -= 0.05;
+                if (l.opacity <= 0) lightning.splice(index, 1);
             });
 
             requestAnimationFrame(animateCanvas);
         }
-        requestAnimationFrame(animateCanvas);
 
-
-        /* --- 2. INTERACTIVE STACKED GALLERY --- */
-        const galleryItems = [
-            {
-                title: "Porsche 911 GT3 RS",
-                subtitle: "FiveM Dynamic Shot",
-                img: "https://images.unsplash.com/photo-1614162692292-7ac56d7f7f1e?auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                title: "Cyberpunk Horizon",
-                subtitle: "Night Cruise Photography",
-                img: "https://images.unsplash.com/photo-1503376780353-7e6692767b70?auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                title: "Supercar Concept",
-                subtitle: "High Speed Cinematic",
-                img: "https://images.unsplash.com/photo-1544829099-b9a0c07fad1a?auto=format&fit=crop&w=1000&q=80"
-            },
-            {
-                title: "Custom Tuner Garage",
-                subtitle: "Vehicle Showcase",
-                img: "https://images.unsplash.com/photo-1552519507-da3b142c6e3d?auto=format&fit=crop&w=1000&q=80"
-            }
-        ];
-
-        let activeIndex = 0;
-        const stackContainer = document.getElementById('stackContainer');
-        const dotsContainer = document.getElementById('dotsContainer');
-
-        function renderGallery() {
-            stackContainer.innerHTML = '';
-            dotsContainer.innerHTML = '';
-
-            galleryItems.forEach((item, index) => {
-                // Create card element
-                const card = document.createElement('div');
-                card.className = 'stack-card absolute w-[88%] sm:w-[92%] h-full rounded-2xl overflow-hidden border border-white/10 shadow-2xl cursor-pointer group';
-                
-                // Calculate position relative to active card
-                let offset = (index - activeIndex + galleryItems.length) % galleryItems.length;
-                
-                // Stack positioning visual math
-                let transform = '';
-                let zIndex = galleryItems.length - offset;
-                let opacity = 1;
-
-                if (offset === 0) {
-                    // Top active card
-                    transform = 'translate3d(0, 0, 0) rotate(0deg) scale(1)';
-                } else if (offset === 1) {
-                    transform = 'translate3d(24px, -12px, 0) rotate(4deg) scale(0.94)';
-                    opacity = 0.85;
-                } else if (offset === 2) {
-                    transform = 'translate3d(45px, -24px, 0) rotate(7deg) scale(0.88)';
-                    opacity = 0.65;
-                } else {
-                    transform = 'translate3d(60px, -36px, 0) rotate(10deg) scale(0.82)';
-                    opacity = 0;
-                }
-
-                card.style.transform = transform;
-                card.style.zIndex = zIndex;
-                card.style.opacity = opacity;
-
-                card.innerHTML = `
-                    <img src="${item.img}" alt="${item.title}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105">
-                    <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-slate-950/20 to-transparent p-6 flex flex-col justify-end">
-                        <span class="text-xs font-semibold text-purple-400 tracking-wider uppercase mb-1">${item.subtitle}</span>
-                        <h3 class="text-lg sm:text-xl font-bold text-white tracking-wide">${item.title}</h3>
-                    </div>
-                `;
-
-                // Card click to make active
-                card.addEventListener('click', () => {
-                    activeIndex = index;
-                    renderGallery();
-                });
-
-                stackContainer.appendChild(card);
-
-                // Dots
-                const dot = document.createElement('button');
-                dot.className = `w-2.5 h-2.5 rounded-full transition-all ${index === activeIndex ? 'w-8 bg-purple-500' : 'bg-slate-700 hover:bg-slate-500'}`;
-                dot.onclick = () => {
-                    activeIndex = index;
-                    renderGallery();
-                };
-                dotsContainer.appendChild(dot);
-            });
-        }
-
-        document.getElementById('prevBtn').onclick = () => {
-            activeIndex = (activeIndex - 1 + galleryItems.length) % galleryItems.length;
-            renderGallery();
-        };
-
-        document.getElementById('nextBtn').onclick = () => {
-            activeIndex = (activeIndex + 1) % galleryItems.length;
-            renderGallery();
-        };
-
-        // Initialize Gallery
-        renderGallery();
-
-
-        /* --- 3. HELPER FUNCTIONS & INTERACTION TOASTS --- */
-        function copyDiscord() {
-            const textToCopy = 'z_master';
-            
-            // Clipboard copy fallbacks
-            if (navigator.clipboard && navigator.clipboard.writeText) {
-                navigator.clipboard.writeText(textToCopy);
-            } else {
-                const tempInput = document.createElement('input');
-                tempInput.value = textToCopy;
-                document.body.appendChild(tempInput);
-                tempInput.select();
-                document.execCommand('copy');
-                document.body.removeChild(tempInput);
-            }
-
-            showToast('Copied to Clipboard!', 'Discord ID: z_master copied.', 'fa-copy', 'text-blue-400');
-        }
-
-        function alertNotice(title, msg) {
-            showToast(title, msg, 'fa-arrow-up-right-from-square', 'text-purple-400');
-        }
-
-        function showToast(title, msg, iconClass = 'fa-check', iconColor = 'text-purple-400') {
-            const toast = document.getElementById('toast');
-            const toastTitle = document.getElementById('toastTitle');
-            const toastMessage = document.getElementById('toastMessage');
-            const toastIcon = document.getElementById('toastIcon');
-
-            toastTitle.textContent = title;
-            toastMessage.textContent = msg;
-            toastIcon.className = `w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-sm ${iconColor}`;
-            toastIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
-
-            toast.classList.remove('translate-y-20', 'opacity-0');
-            toast.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                toast.classList.remove('translate-y-0', 'opacity-100');
-                toast.classList.add('translate-y-20', 'opacity-0');
-            }, 3000);
-        }
+        animateCanvas();
     </script>
 </body>
 </html>
